@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-rgb(121, 59, 59)
+
 body {
   font-family: Arial, Helvetica, sans-serif;
 }

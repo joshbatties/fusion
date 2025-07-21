@@ -6,7 +6,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { joinWaitlist } from "../actions/waitlist"
+import { joinWaitlist } from "@/app/actions/waitlist"
 import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react"
 
 export default function WaitlistForm() {
@@ -26,7 +26,11 @@ export default function WaitlistForm() {
 
     try {
       setStatus("loading")
-      const result = await joinWaitlist({ email, name })
+      const formData = new FormData()
+      formData.append("email", email)
+      formData.append("name", name)
+      
+      const result = await joinWaitlist(formData)
 
       if (result.success) {
         setStatus("success")
@@ -48,78 +52,69 @@ export default function WaitlistForm() {
       <div className="rounded-lg border border-zinc-700 bg-zinc-800 p-8 text-white shadow-sm">
         <div className="flex flex-col items-center justify-center space-y-3 text-center">
           <CheckCircle2 className="h-10 w-10 text-[#faa911]" />
-          <h3 className="text-xl font-semibold">You're on the list!</h3>
-          <p className="text-zinc-300">{message}</p>
-          <Button
-            variant="outline"
-            className="mt-4 border-zinc-700 text-white hover:bg-zinc-700"
-            onClick={() => setStatus("idle")}
-          >
-            Join with another email
-          </Button>
+          <h3 className="text-lg font-semibold">You're on the waitlist!</h3>
+          <p className="text-zinc-400">{message}</p>
         </div>
       </div>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {status === "error" && (
-        <div className="flex items-center gap-2 rounded-lg bg-red-900/30 border border-red-900/50 p-3 text-red-300">
-          <AlertCircle className="h-5 w-5" />
-          <p className="text-sm">{message}</p>
+    <div className="rounded-lg border border-zinc-700 bg-zinc-800 p-8 text-white shadow-sm">
+      <div className="space-y-4">
+        <div className="text-center">
+          <h3 className="text-lg font-semibold">Join the Waitlist</h3>
+          <p className="text-sm text-zinc-400">Be among the first to experience Fusion</p>
         </div>
-      )}
-
-      <div className="space-y-2">
-        <Label htmlFor="name" className="text-white">
-          Full Name
-        </Label>
-        <Input
-          id="name"
-          placeholder="Enter your name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          disabled={status === "loading"}
-          required
-          className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus-visible:ring-[#ef3a19]"
-        />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name" className="text-white">Name</Label>
+            <Input
+              id="name"
+              type="text"
+              placeholder="Enter your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="bg-zinc-700 border-zinc-600 text-white placeholder:text-zinc-400"
+              disabled={status === "loading"}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-white">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="bg-zinc-700 border-zinc-600 text-white placeholder:text-zinc-400"
+              disabled={status === "loading"}
+              required
+            />
+          </div>
+          {status === "error" && (
+            <div className="flex items-center space-x-2 text-red-400">
+              <AlertCircle className="h-4 w-4" />
+              <p className="text-sm">{message}</p>
+            </div>
+          )}
+          <Button
+            type="submit"
+            className="w-full bg-[#ef3a19] hover:bg-[#ef3a19]/90 text-white"
+            disabled={status === "loading"}
+          >
+            {status === "loading" ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Joining...
+              </>
+            ) : (
+              "Join Waitlist"
+            )}
+          </Button>
+        </form>
       </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="email" className="text-white">
-          Email Address
-        </Label>
-        <Input
-          id="email"
-          type="email"
-          placeholder="Enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={status === "loading"}
-          required
-          className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus-visible:ring-[#ef3a19]"
-        />
-      </div>
-
-      <Button
-        type="submit"
-        className="w-full bg-[#ef3a19] hover:bg-[#ef3a19]/90 text-white"
-        disabled={status === "loading"}
-      >
-        {status === "loading" ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Joining...
-          </>
-        ) : (
-          "Join the Waitlist"
-        )}
-      </Button>
-
-      <p className="text-xs text-center text-zinc-400">
-        By joining, you agree to our Terms of Service and Privacy Policy.
-      </p>
-    </form>
+    </div>
   )
-}
+} 
